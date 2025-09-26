@@ -1,6 +1,8 @@
 ﻿#include <Windows.h>
 #include "resource.h"
 
+CONST CHAR login_invite[] = "Введите имя пользователя";
+
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, INT nCmdShow)
@@ -24,15 +26,27 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_INITDIALOG:		//Эта секция выполняется один раз, нужна для добавления элементов в окно диалога
 	{
-	HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
-	SetFocus(hEditLogin);
-	HICON hIcon = LoadIcon(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDI_ICON1));
-	SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+		HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
+		SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)login_invite);
+		//SetFocus(hEditLogin);
+		HICON hIcon = LoadIcon(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDI_ICON1));
+		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 	}
-		break;
+	break;
 	case WM_COMMAND:		//Обрабатывает команды с клавиатуры и мыши
 		switch (LOWORD(wParam))
 		{
+		case IDC_EDIT_LOGIN:
+			//case WM_LBUTTONDOWN:
+		{
+			CONST INT SIZE = 256;
+			CHAR sz_buffer[SIZE] = {};
+			HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
+			SendMessage(hEditLogin, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
+			if (HIWORD(wParam) == EN_SETFOCUS && strcmp(sz_buffer, login_invite) == 0) SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)"");
+			if (HIWORD(wParam) == EN_KILLFOCUS && strcmp(sz_buffer, "") == 0) SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)login_invite);
+		}
+		break;
 		case IDC_BUTTON_COPY:
 		{
 			CONST INT SIZE = 256;
