@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35506.116 d17.12
+VisualStudioVersion = 17.12.35506.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinAPI", "WinAPI\WinAPI.vcxproj", "{FAC7E8F6-0832-49C3-ADDD-7E6384DB25AB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ComboBox", "ComboBox\ComboBox.vcxproj", "{224AA75F-BAC8-4138-AD0B-E4565A1ABE0F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ListBox", "ListBox\ListBox.vcxproj", "{465EF81D-1415-4BFA-81DB-A71BF5E53057}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +33,14 @@ Global
 		{224AA75F-BAC8-4138-AD0B-E4565A1ABE0F}.Release|x64.Build.0 = Release|x64
 		{224AA75F-BAC8-4138-AD0B-E4565A1ABE0F}.Release|x86.ActiveCfg = Release|Win32
 		{224AA75F-BAC8-4138-AD0B-E4565A1ABE0F}.Release|x86.Build.0 = Release|Win32
+		{465EF81D-1415-4BFA-81DB-A71BF5E53057}.Debug|x64.ActiveCfg = Debug|x64
+		{465EF81D-1415-4BFA-81DB-A71BF5E53057}.Debug|x64.Build.0 = Debug|x64
+		{465EF81D-1415-4BFA-81DB-A71BF5E53057}.Debug|x86.ActiveCfg = Debug|Win32
+		{465EF81D-1415-4BFA-81DB-A71BF5E53057}.Debug|x86.Build.0 = Debug|Win32
+		{465EF81D-1415-4BFA-81DB-A71BF5E53057}.Release|x64.ActiveCfg = Release|x64
+		{465EF81D-1415-4BFA-81DB-A71BF5E53057}.Release|x64.Build.0 = Release|x64
+		{465EF81D-1415-4BFA-81DB-A71BF5E53057}.Release|x86.ActiveCfg = Release|Win32
+		{465EF81D-1415-4BFA-81DB-A71BF5E53057}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
