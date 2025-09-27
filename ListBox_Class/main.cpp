@@ -7,6 +7,7 @@ CONST CHAR* g_ITEMS[] = { "This", "is", "my", "First", "List", "Box" };
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcAdd(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+BOOL CALLBACK DlgProcEdit(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -34,6 +35,12 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
+		case IDC_LIST:
+			if (HIWORD(wParam) == LBN_DBLCLK)
+			{
+				DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG_ADD), hwnd, (DLGPROC)DlgProcEdit, 0);
+			}
+			break;
 		case IDC_BUTTON_ADD:
 		{
 			DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_DIALOG_ADD), hwnd, (DLGPROC)DlgProcAdd, 0);
@@ -88,6 +95,37 @@ BOOL CALLBACK DlgProcAdd(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case IDCANCEL:
 			EndDialog(hwnd, 0);
 		}
+		break;
+	case WM_CLOSE:
+		EndDialog(hwnd, 0);
+	}
+	return FALSE;
+}
+
+BOOL CALLBACK DlgProcEdit(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_INITDIALOG:
+	{
+		SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)"Изменить элемент");
+		CHAR sz_buffer[FILENAME_MAX] = {};
+		HWND hListBox = GetDlgItem(GetParent(hwnd), IDC_LIST);
+		HWND hEditItem = GetDlgItem(hwnd, IDC_EDIT_ITEM);
+		INT i = SendMessage(hListBox, LB_GETCURSEL, 0, 0);
+		SendMessage(hListBox, LB_GETTEXT, i, (LPARAM)sz_buffer);
+		SendMessage(hEditItem, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+	}
+		break;
+	case WM_COMMAND:
+	{
+		switch (LOWORD(wParam))
+		{
+		case IDOK:
+			break;
+		case IDCANCEL:
+		}
+	}
 		break;
 	case WM_CLOSE:
 		EndDialog(hwnd, 0);
