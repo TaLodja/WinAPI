@@ -1,7 +1,9 @@
 ﻿#include <Windows.h>
 #include "resource.h"
 
-CONST CHAR login_invite[] = "Введите имя пользователя";
+CONST CHAR g_sz_LOGIN_INVITE[] = "Введите имя пользователя";
+//g - global
+//sz - String Zero (NULL - Terminated Line)
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -27,7 +29,7 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_INITDIALOG:		//Эта секция выполняется один раз, нужна для добавления элементов в окно диалога
 	{
 		HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
-		SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)login_invite);
+		SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)g_sz_LOGIN_INVITE);
 		//SetFocus(hEditLogin);
 		HICON hIcon = LoadIcon(GetModuleHandleA(NULL), MAKEINTRESOURCE(IDI_ICON1));
 		SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
@@ -38,14 +40,24 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_EDIT_LOGIN:
 		{
+			HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);		//Получаем дескриптор поля Login
 			CONST INT SIZE = 256;
 			CHAR sz_buffer[SIZE] = {};
-			HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
 			SendMessage(hEditLogin, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
-			if (HIWORD(wParam) == EN_SETFOCUS && strcmp(sz_buffer, login_invite) == 0) 
+			if (HIWORD(wParam) == EN_SETFOCUS)
+			{
+				if (strcmp(sz_buffer, g_sz_LOGIN_INVITE) == 0)
+					SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)"");
+			}
+			if (HIWORD(wParam) == EN_KILLFOCUS)
+			{
+				if (strcmp(sz_buffer, "") == 0)
+					SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)g_sz_LOGIN_INVITE);
+			}
+			/*if (HIWORD(wParam) == EN_SETFOCUS && strcmp(sz_buffer, g_sz_LOGIN_INVITE) == 0)
 				SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)"");
 			if (HIWORD(wParam) == EN_KILLFOCUS && strcmp(sz_buffer, "") == 0) 
-				SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)login_invite);
+				SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)g_sz_LOGIN_INVITE);*/
 		}
 		break;
 		case IDC_BUTTON_COPY:
