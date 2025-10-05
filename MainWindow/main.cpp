@@ -70,15 +70,78 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_CREATE:
-		break;
+	{
+		HWND hStatic = CreateWindowEx
+		(
+			NULL,
+			"Static",
+			"Этот Static-text создан при помощи функции CreateWindowEx",
+			WS_CHILD | WS_VISIBLE,
+			10, 10,
+			500, 25,
+			hwnd,
+			(HMENU)1000,
+			GetModuleHandle(NULL),
+			NULL
+		);
+		//WS - WindowStyle
+		//ES - EditControlStyle
+		//WS_CHILD - показывает, что создаваемое окно является дочерним элементом интерфейса какого-то другого окна
+		HWND hEdit = CreateWindowEx
+		(
+			NULL,
+			"Edit",
+			"",
+			WS_CHILD | WS_VISIBLE | WS_BORDER,
+			10, 45,
+			500, 22,
+			hwnd,
+			(HMENU)1001,
+			GetModuleHandle(NULL),
+			NULL
+		);
+		HWND hButton = CreateWindowEx
+		(
+			NULL,
+			"Button",
+			"Применить",
+			WS_CHILD | WS_VISIBLE,
+			430, 70,
+			80, 32,
+			hwnd,
+			(HMENU)1002,
+			GetModuleHandle(NULL),
+			NULL
+		);
+	}
+	break;
 	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case 1002:
+		{
+			MessageBox(hwnd, "Привет", "Привет", MB_OK | MB_ICONINFORMATION);
+			CONST INT SIZE = 256;
+			CHAR sz_buffer[SIZE] = {};
+			HWND hStatic = GetDlgItem(hwnd, 1000);
+			HWND hEdit = GetDlgItem(hwnd, 1001);
+
+			SendMessage(hEdit, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
+			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			SendMessage(GetDlgItem(hwnd, 1002), WM_SETTEXT, 0, (LPARAM)sz_buffer);
+		}
+		break;
+		}
 		break;
 	case WM_DESTROY:
+		MessageBox(NULL, "Лучше двери закройте...", "Finita la comedia", MB_OK | MB_ICONERROR);
 		PostQuitMessage(0);
 		break;
 	case WM_CLOSE:
-		DestroyWindow(hwnd);
-		//SendMessage(hwnd, WM_DESTROY, 0, 0);
+		//DestroyWindow(hwnd);
+		if (MessageBox(hwnd, "Вы действительно хотите закрыть окно?", "Че, внатуре?", MB_YESNO | MB_ICONQUESTION) == IDYES)
+			SendMessage(hwnd, WM_DESTROY, 0, 0);
 		break;
 	default: return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
