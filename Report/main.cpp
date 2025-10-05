@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
 #include <Commctrl.h>
 #include <cstdio>
@@ -28,38 +29,54 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		case IDC_BUTTON_GEN:
 		{
-			CHAR* Characteristics[10] = {};
 			HWND hList = GetDlgItem(hwnd, IDC_LIST);
-			HWND FullName[3] = {};
-			FullName[0] = GetDlgItem(hwnd, IDC_SURNAME);
-			FullName[1] = GetDlgItem(hwnd, IDC_NAME);
-			FullName[2] = GetDlgItem(hwnd, IDC_PATR);
 			CHAR sz_buffer[FILENAME_MAX] = {};
-			CHAR sz_descript[FILENAME_MAX] = {};
-			for (int i = 0; i < 3; i++)
+			for (int i = 1001; i <= 1003; i++)
 			{
-				SendMessage(FullName[i], WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
-				if (sz_buffer != "")
+				CHAR sz_message[FILENAME_MAX] = {};
+				SendMessage(GetDlgItem(hwnd, i), WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+				switch (i)
 				{
-					Characteristics[i] = sz_buffer;
-					SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)Characteristics[i]);
+				case 1001:
+				{
+					sprintf(sz_message, "Фамилия: %s", sz_buffer);
+				}
+				break;
+				case 1002:
+					sprintf(sz_message, "Имя: %s", sz_buffer);
+					break;
+				case 1003:
+					sprintf(sz_message, "Отчество: %s", sz_buffer);
+				}
+				SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)sz_message);
+			}
+			for (int i = 1004; i <= 1010; i++)
+			{
+				CHAR sz_message[FILENAME_MAX] = {};
+				HWND hCheck = GetDlgItem(hwnd, i);
+				SendMessage(hCheck, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+				if (SendMessage(hCheck, BM_GETCHECK, 0, 0) == BST_CHECKED)
+				{
+					if (i <= 1007) sprintf(sz_message, "+ %s", sz_buffer);
+					else sprintf(sz_message, "- %s", sz_buffer);
+					SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)sz_message);
 				}
 			}
-			HWND hCheck = GetDlgItem(hwnd, IDC_CHECK1);
-			if (SendMessage(hCheck, BM_GETCHECK, 0, 0) == BST_CHECKED)
-			{
-			SendMessage(hCheck, BCM_GETNOTE, FILENAME_MAX, (LPARAM)sz_descript);
-			Characteristics[4] = sz_descript;
-			SendMessage(hList, LB_ADDSTRING, 0, (LPARAM)Characteristics[4]);
-			}
+		}
+		break;
+		case IDC_BUTTON_CLEAR:
+		{
+			HWND hList = GetDlgItem(hwnd, IDC_LIST);
+			INT Count = SendMessage(hList, LB_GETCOUNT, 0, 0);
+			for (int i = Count; i > 0; i--)
+				SendMessage(hList, LB_DELETESTRING, i-1, 0);
 		}
 		break;
 		case IDOK:
 		{
+			CONST CHAR* l_contain[] = { "Фамилия", "Имя" };
 			HWND hList = GetDlgItem(hwnd, IDC_LIST);
-			if (SendMessage(hList, LB_GETCOUNT, 0, 0) < 3)
-				MessageBox(hwnd, "Вы не сгенерировали отзыв", "Info", MB_OK | MB_ICONINFORMATION);
-			else MessageBox(hwnd, "Отзыв о студенте составлен", "Info", MB_OK | MB_ICONINFORMATION);
+			if (MessageBox(hwnd, "Отзыв о студенте составлен?", "Info", MB_YESNO | MB_ICONQUESTION) == IDYES) EndDialog(hwnd, 0);
 		}
 		break;
 		case IDCANCEL:
