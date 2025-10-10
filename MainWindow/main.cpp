@@ -1,7 +1,11 @@
-﻿#include <Windows.h>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <Windows.h>
+#include <cstdio>
 #include "resource.h"
 
 CONST CHAR g_sz_WND_CLASS_NAME[] = "My Windows Class";
+CONST INT XMonitor = GetSystemMetrics(SM_CXSCREEN);
+CONST INT YMonitor = GetSystemMetrics(SM_CYSCREEN);
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -34,15 +38,23 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 		return 0;
 	}
 
-	HWND hwnd = CreateWindowEx	//Дескриптор окна
+	INT WidthWindow = XMonitor*0.75;
+	INT HeightWindow = YMonitor *0.75;
+	INT StartX = (XMonitor - WidthWindow) / 2;
+	INT StartY = (YMonitor - HeightWindow) / 2;
+	CHAR gz_message[FILENAME_MAX] = {};
+	sprintf(gz_message, "%s. Размер окна: %i x %i. Положение окна: X = %i, Y = %i",
+		g_sz_WND_CLASS_NAME, WidthWindow, HeightWindow, StartX, StartY);
+
+	HWND hwnd = CreateWindowEx		//Дескриптор окна
 	(
-		NULL,					//exStyles
-		g_sz_WND_CLASS_NAME,	//Class name
-		g_sz_WND_CLASS_NAME,	//Window title (Заголовок окна)
-		WS_OVERLAPPEDWINDOW,	//Стиль окна
-		CW_USEDEFAULT, CW_USEDEFAULT,	//Window position
-		CW_USEDEFAULT, CW_USEDEFAULT,	//Window size
-		NULL,					//Родительское окно
+		NULL,						//exStyles
+		g_sz_WND_CLASS_NAME,		//Class name
+		gz_message,					//Window title (Заголовок окна)
+		WS_OVERLAPPEDWINDOW,		//Стиль окна
+		StartX, StartY,				//Window position
+		WidthWindow, HeightWindow,	//Window size
+		NULL,						//Родительское окно
 		NULL,
 		hInstance,
 		NULL
@@ -113,6 +125,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
+
+		CHAR gz_message_size[FILENAME_MAX] = {};
+		sprintf(gz_message_size, "Размеры монитора: %i x %i", XMonitor, YMonitor);
+
+		HWND hStaticSizeWindow = CreateWindowEx
+		(
+			NULL,
+			"Static",
+			gz_message_size,
+			WS_CHILD | WS_VISIBLE,
+			10, 90,
+			500, 22,
+			hwnd,
+			(HMENU)1003,
+			GetModuleHandle(NULL),
+			NULL
+		);
 	}
 	break;
 	case WM_COMMAND:
@@ -128,7 +157,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			SendMessage(hEdit, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
 			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)sz_buffer);
-			SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			//SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 			SendMessage(GetDlgItem(hwnd, 1002), WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
 		break;
