@@ -14,18 +14,18 @@
 #define IDC_BUTTON_7                    1007
 #define IDC_BUTTON_8                    1008
 #define IDC_BUTTON_9                    1009
+#define IDC_BUTTON_POINT                1010
 
-#define IDC_BUTTON_PLUS                 1010
-#define IDC_BUTTON_MINUS                1011
-#define IDC_BUTTON_ASTER                1012
-#define IDC_BUTTON_SLASH                1013
-#define IDC_BUTTON_BIN_MINUS            1014
-#define IDC_BUTTON_POINT                1015
-#define IDC_BUTTON_REVERSE              1016
-#define IDC_BUTTON_POW                  1017
-#define IDC_BUTTON_SQRT                 1018
-#define IDC_BUTTON_PERCENT              1019
-#define IDC_BUTTON_EQUAL                1020
+#define IDC_BUTTON_PLUS                 1011
+#define IDC_BUTTON_MINUS                1012
+#define IDC_BUTTON_ASTER                1013
+#define IDC_BUTTON_SLASH                1014
+#define IDC_BUTTON_PERCENT              1015
+#define IDC_BUTTON_EQUAL                1016
+#define IDC_BUTTON_BIN_MINUS            1017
+#define IDC_BUTTON_REVERSE              1018
+#define IDC_BUTTON_POW                  1019
+#define IDC_BUTTON_SQRT                 1020
 
 
 #define IDC_BUTTON_CLEAR                1021

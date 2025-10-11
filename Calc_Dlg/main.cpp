@@ -5,7 +5,6 @@
 #include "resource.h"
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-void FillEdit(HWND hEdit, CHAR sz_buffer[FILENAME_MAX], CHAR digit);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hOrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -30,55 +29,140 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		BOOL PressedButtonDigit = FALSE;
 		BOOL PressedButtonOperation = FALSE;
 		CHAR sz_buffer[FILENAME_MAX];
+		CHAR digit[2] = {};
 		CHAR sz_expression[FILENAME_MAX];
+		INT operation;
 		HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
 		HWND hExpression = GetDlgItem(hwnd, IDC_EXPRESSION);
-		SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
-		INT len = strlen(sz_buffer);
-		//INT iFirst = 0, iSecond, iResult;
 
-		//CONST INT IDdigit[10] = { 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009 };
-		//CONST INT IDtwoOperands[4] = {1010, 1011, 1012, 1013};
-		//CONST INT IDoneOperands[6] = {1014, 1015, 1016, 1017, 1018, 1019};
-		if (LOWORD(wParam) >= IDC_BUTTON_0 && LOWORD(wParam) <= IDC_BUTTON_9 && !PressedButtonOperation)
+		if (LOWORD(wParam) >= IDC_BUTTON_0 && LOWORD(wParam) <= IDC_BUTTON_9)
 		{
-			if (!PressedButtonOperation && !PressedButtonDigit)
-			{
-				CHAR digit[2] = {};
-				_itoa(LOWORD(wParam) - IDC_BUTTON_0, digit, 10);
-				INT i = 0;
-				while (i < len)
-				{
-					if (sz_buffer[i] == '0' && !strchr(sz_buffer, '.'))
-					{
-						sz_buffer[i] = sz_buffer[i + 1];
-						len--;
-						i++;
-					}
-					else break;
-				}
-				SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)strcat(sz_buffer, digit));
-				SendMessage(hExpression, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			if (!PressedButtonDigit && PressedButtonOperation)
+				SendMessage(hExpression, WM_SETTEXT, 0, (LPARAM)"");
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			_itoa(LOWORD(wParam) - IDC_BUTTON_0, digit, 10);
+			if (strlen(sz_buffer) == 1 && sz_buffer[0] == '0')
+				sz_buffer[0] = digit[0];
+			else strcat(sz_buffer, digit);
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			SendMessage(hExpression, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 			PressedButtonDigit = TRUE;
-			}
-			if (PressedButtonOperation && !PressedButtonDigit)
-			{
-				strcpy(sz_buffer, "0");
-			}
 		}
+		//if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_EQUAL)
+		//{
+		//	operation = LOWORD(wParam);
+		//	if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_SLASH && !PressedButtonOperation)
+		//	{
+		//	SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+		//	a = atof(sz_buffer);
+		//	PressedButtonOperation = TRUE;
+		//	PressedButtonDigit = FALSE;
+		//	}
+		//	if (LOWORD(wParam) == IDC_BUTTON_EQUAL && PressedButtonOperation)
+		//	{
+		//		DOUBLE buffer = a;
+		//		b = atof(sz_buffer);
+		//		switch (operation)
+		//		{
+		//		case IDC_BUTTON_PLUS:
+		//		{
+		//			sprintf(sz_expression, "%g + %g", buffer, b);
+		//			a += b;
+		//		}
+		//		break;
+		//		case IDC_BUTTON_MINUS:
+		//		{
+		//			sprintf(sz_expression, "%g - %g", buffer, b);
+		//			a -= b;
+		//		}
+		//		break;
+		//		case IDC_BUTTON_ASTER:
+		//		{
+		//			sprintf(sz_expression, "%g * %g", buffer, b);
+		//			a *= b;
+		//		}
+		//		break;
+		//		case IDC_BUTTON_SLASH:
+		//		{
+		//			sprintf(sz_expression, "%g / %g", buffer, b);
+		//			if (b != 0) a /= b;
+		//			else strcpy(sz_buffer, "Деление на 0!");
+		//		}
+		//		break;
+		//		}
+		//		sprintf(sz_buffer, "%g", a);
+		//		SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+		//		//SendMessage(hExpression, WM_SETTEXT, 0, (LPARAM)sz_expression);
+		//		PressedButtonOperation = FALSE;
+		//		PressedButtonDigit = FALSE;
+		//	}
+		//}
 		switch (LOWORD(wParam))
 		{
 		case IDC_BUTTON_POINT:
 		{
-			if (strchr(sz_buffer, '.')) break;
-			if (sz_buffer == "0") strcpy(sz_buffer, "0.");
-			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)strcat(sz_buffer, "."));
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			if (!strchr(sz_buffer, '.')) SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)strcat(sz_buffer, "."));
+			else break;
 			SendMessage(hExpression, WM_SETTEXT, 0, (LPARAM)sz_buffer);
-			PressedButtonDigit = TRUE;
+		}
+		break;
+		case IDC_BUTTON_PLUS:
+		{
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			a = atof(sz_buffer);
+		}
+		break;
+		case IDC_BUTTON_BIN_MINUS:
+		{
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			a = -atof(sz_buffer);
+			sprintf(sz_buffer, "%g", a);
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			SendMessage(hExpression, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+		}
+		break;
+		case IDC_BUTTON_REVERSE:
+		{
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			a = atof(sz_buffer);
+			b = 1 / a;
+			sprintf(sz_buffer, "%g", b);
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			sprintf(sz_expression, "1/%g", a);
+			SendMessage(hExpression, WM_SETTEXT, 0, (LPARAM)sz_expression);
+		}
+		break;
+		case IDC_BUTTON_POW:
+		{
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			a = atof(sz_buffer);
+			b = a * a;
+			sprintf(sz_buffer, "%g", b);
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			sprintf(sz_expression, "%g^2", a);
+			SendMessage(hExpression, WM_SETTEXT, 0, (LPARAM)sz_expression);
+		}
+		break;
+		case IDC_BUTTON_SQRT:
+		{
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			a = atof(sz_buffer);
+			if (a >= 0)
+			{
+				b = sqrt(a);
+				sprintf(sz_buffer, "%g", b);
+			}
+			else strcpy(sz_buffer, "Error!");
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			sprintf(sz_expression, "sqrt(%g)", a);
+			SendMessage(hExpression, WM_SETTEXT, 0, (LPARAM)sz_expression);
 		}
 		break;
 		case IDC_BUTTON_BSP:
 		{
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			INT len = strlen(sz_buffer);
 			if (len > 1) sz_buffer[--len] = '\0';
 			else sz_buffer[0] = '0';
 			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
@@ -92,28 +176,6 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			PressedButtonOperation = FALSE;
 			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)"0");
 			SendMessage(hExpression, WM_SETTEXT, 0, (LPARAM)"0");
-		}
-		break;
-		case IDC_BUTTON_PLUS:
-		{
-
-			if (a == 0) a = atof(sz_buffer);
-			if (PressedButtonOperation)
-			{
-				if (PressedButtonDigit || b == 0 && !PressedButtonDigit) b = atof(sz_buffer);
-				a += b;
-			}
-			PressedButtonOperation = FALSE;
-			if (a == 0) strcpy(sz_buffer, "0");
-			else sprintf(sz_buffer, "%a", a);
-			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
-			CHAR sz_operator[4] = " + ";
-			SendMessage(hExpression, WM_GETTEXT, FILENAME_MAX, (LPARAM)strcat(sz_buffer, sz_operator));
-		}
-		break;
-		case IDC_BUTTON_EQUAL:
-		{
-
 		}
 		break;
 		}
