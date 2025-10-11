@@ -3,6 +3,7 @@
 // Used by Resource.rc
 //
 #define IDI_ICON1						101
+#define IDC_EDIT						999
 #define IDC_BUTTON_0					1000
 #define IDC_BUTTON_1					1001
 #define IDC_BUTTON_2					1002
