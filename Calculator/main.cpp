@@ -1,4 +1,6 @@
-﻿#include <Windows.h>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <Windows.h>
+#include <cstdio>
 #include "resource.h"
 
 CONST CHAR g_sz_CLASS_NAME[] = "Calc_SPU_411";
@@ -23,6 +25,7 @@ CONST INT g_i_OPERATIONS_START_X = g_i_BUTTON_START_X + (g_i_BUTTON_SIZE + g_i_I
 #define BUTTON_SHIFT_Y(shift) g_i_BUTTON_START_Y+(g_i_BUTTON_SIZE + g_i_INTERVAL)*(shift)
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+DOUBLE arithmetic_operation(WORD operation, DOUBLE a, DOUBLE b);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -92,7 +95,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		HWND hEdit = CreateWindowEx
 		(
-			NULL, "Edit", "",
+			NULL, "Edit", "0",
 			WS_CHILD | WS_VISIBLE | WS_BORDER,
 			10, 10,
 			g_i_SCREEN_WIDTH, g_i_SCREEN_HEIGHT,
@@ -107,7 +110,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			for (int j = 0; j < 3; j++)
 			{
-				sz_digit[0] = digit++ + '0';
+				sz_digit[0] = digit + '0';
 				CreateWindowEx
 				(
 					NULL, "Button", sz_digit,
@@ -121,6 +124,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					GetModuleHandle(NULL),
 					NULL
 				);
+				digit++;
 			}
 		}
 		CreateWindowEx
@@ -198,7 +202,79 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 	break;
 	case WM_COMMAND:
-		break;
+	{
+		FLOAT a = 0, b=0;
+		CHAR sz_buffer[FILENAME_MAX] = {};
+		CHAR sz_digit[2] = {};
+		INT operation = 0;
+		HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
+
+		BOOL input_digit = FALSE;
+		BOOL input_operation = FALSE;
+		BOOL input_equal = FALSE;
+
+		if (LOWORD(wParam) >= IDC_BUTTON_0 && LOWORD(wParam) <= IDC_BUTTON_9)
+		{
+			if (input_operation || input_equal)
+			{
+				SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)"0");
+				input_operation = input_equal = FALSE;
+			}
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			_itoa(LOWORD(wParam) - IDC_BUTTON_0, sz_digit, 10);
+			if (sz_buffer[0] == '0' && strlen(sz_buffer) == 1)
+				sz_buffer[0] = sz_digit[0];
+			else strcat(sz_buffer, sz_digit);
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			input_digit = TRUE;
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_POINT)
+		{
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			if (!strchr(sz_buffer, '.'))
+				SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)strcat(sz_buffer, "."));
+			else break;
+		}
+		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_SLASH)
+		{
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			operation = LOWORD(wParam);
+			if (input_digit && a == 0) a = atof(sz_buffer);
+			if (input_digit && a != 0)
+			{
+				b = atof(sz_buffer);
+				a = arithmetic_operation(operation, a, b);
+				sprintf(sz_buffer, "%f", a);
+				SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			}
+			input_operation = TRUE;
+			input_digit = input_equal = FALSE;
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
+		{
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			if (input_digit) b = atof(sz_buffer);
+			a = arithmetic_operation(operation, a, b);
+			sprintf(sz_buffer, "%f", a);
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			input_equal = TRUE;
+			input_digit = input_operation = FALSE;
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_CLR)
+		{
+			a = b = 0;
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)"0");
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_BSP)
+		{
+			SendMessage(hEdit, WM_GETTEXT, FILENAME_MAX, (LPARAM)sz_buffer);
+			INT len = strlen(sz_buffer);
+			if (len > 1) sz_buffer[--len] = '\0';
+			else sz_buffer[0] = '0';
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+		}
+	}
+	break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -208,4 +284,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	default: return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
 	return FALSE;
+}
+
+DOUBLE arithmetic_operation(WORD operation, DOUBLE a, DOUBLE b)
+{
+	switch (operation)
+	{
+	case IDC_BUTTON_PLUS: a += b; break;
+	case IDC_BUTTON_MINUS: a -= b; break;
+	case IDC_BUTTON_ASTER: a *= b; break;
+	case IDC_BUTTON_SLASH: a /= b; break;
+	}
+	return a;
 }
