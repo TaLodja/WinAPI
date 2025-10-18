@@ -203,7 +203,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	break;
 	case WM_COMMAND:
 	{
-		FLOAT a = 0, b=0;
+		FLOAT a = 0, b = 0;
 		CHAR sz_buffer[FILENAME_MAX] = {};
 		CHAR sz_digit[2] = {};
 		INT operation = 0;
