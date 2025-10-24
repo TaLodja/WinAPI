@@ -1,5 +1,6 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 #include <Windows.h>
+#include <Winuser.h>
 #include <float.h>
 #include <stdio.h>
 #include "resource.h"
@@ -21,6 +22,26 @@ CONST INT g_i_BUTTON_START_Y = g_i_START_Y + g_i_SCREEN_HEIGHT + g_i_INTERVAL * 
 
 CONST CHAR g_OPERATIONS[] = "+-*/";
 CONST INT g_i_OPERATIONS_START_X = g_i_BUTTON_START_X + (g_i_BUTTON_SIZE + g_i_INTERVAL) * 3;
+
+CONST CHAR* IMAGE_DIGIT[]
+{
+	"Button_1.bmp",
+	"Button_2.bmp",
+	"Button_3.bmp",
+	"Button_4.bmp",
+	"Button_5.bmp",
+	"Button_6.bmp",
+	"Button_7.bmp",
+	"Button_8.bmp",
+	"Button_9.bmp"
+};
+CONST CHAR* IMAGE_OPERATION[]
+{
+	"Button_Plus.bmp",
+	"Button_Minus.bmp",
+	"Button_Aster.bmp",
+	"Button_Slash.bmp",
+};
 
 #define BUTTON_SHIFT_X(shift) g_i_BUTTON_START_X+(g_i_BUTTON_SIZE + g_i_INTERVAL)*(shift)
 #define BUTTON_SHIFT_Y(shift) g_i_BUTTON_START_Y+(g_i_BUTTON_SIZE + g_i_INTERVAL)*(shift)
@@ -112,6 +133,19 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
+		CreateWindowEx
+		(
+			NULL, "Button", "0",
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
+			BUTTON_SHIFT_X(0), BUTTON_SHIFT_Y(3),
+			g_i_BUTTON_DOUBLE_SIZE, g_i_BUTTON_SIZE,
+			hwnd,
+			(HMENU)IDC_BUTTON_0,
+			GetModuleHandle(NULL),
+			NULL
+		);
+		HBITMAP hButton_0 = (HBITMAP)LoadImage(GetModuleHandle(NULL), "Button_0.bmp", IMAGE_BITMAP, g_i_BUTTON_DOUBLE_SIZE, g_i_BUTTON_SIZE, LR_LOADFROMFILE);
+		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hButton_0);
 		INT digit = 1;
 		CHAR sz_digit[2] = "";
 		for (int i = 6; i >= 0; i -= 3)
@@ -122,7 +156,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				CreateWindowEx
 				(
 					NULL, "Button", sz_digit,
-					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+					WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 					BUTTON_SHIFT_X(j), BUTTON_SHIFT_Y(i / 3),
 					//g_i_BUTTON_START_X + (g_i_BUTTON_SIZE + g_i_INTERVAL) * j,
 					//g_i_BUTTON_START_Y + (g_i_BUTTON_SIZE + g_i_INTERVAL) * i/3,
@@ -135,21 +169,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				digit++;
 			}
 		}
-		CreateWindowEx
-		(
-			NULL, "Button", "0",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
-			BUTTON_SHIFT_X(0), BUTTON_SHIFT_Y(3),
-			g_i_BUTTON_DOUBLE_SIZE, g_i_BUTTON_SIZE,
-			hwnd,
-			(HMENU)IDC_BUTTON_0,
-			GetModuleHandle(NULL),
-			NULL
-		);
+		HBITMAP hButton_digit[9] = {};
+		for (int i = 0; i < 9;i++)
+		{
+			hButton_digit[i] = (HBITMAP)LoadImage(GetModuleHandle(NULL), IMAGE_DIGIT[i], IMAGE_BITMAP, g_i_BUTTON_SIZE, g_i_BUTTON_SIZE, LR_LOADFROMFILE);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_1 + i), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hButton_digit[i]);
+		}
 		CreateWindowEx
 		(
 			NULL, "Button", ".",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 			BUTTON_SHIFT_X(2), BUTTON_SHIFT_Y(3),
 			g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
 			hwnd,
@@ -157,6 +186,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
+		HBITMAP hButton_Point = (HBITMAP)LoadImage(GetModuleHandle(NULL), "Button_Point.bmp", IMAGE_BITMAP, g_i_BUTTON_SIZE, g_i_BUTTON_SIZE, LR_LOADFROMFILE);
+		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_POINT), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hButton_Point);
 		CHAR operation[2] = "";
 		for (int i = 0; i < 4; i++)
 		{
@@ -164,7 +195,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			CreateWindowEx
 			(
 				NULL, "Button", operation,
-				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+				WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 				BUTTON_SHIFT_X(3), BUTTON_SHIFT_Y(3 - i),
 				g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
 				hwnd,
@@ -173,10 +204,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				NULL
 			);
 		}
+		HBITMAP hButton_operation[4] = {};
+		for (int i = 0; i < 4;i++)
+		{
+			hButton_operation[i] = (HBITMAP)LoadImage(GetModuleHandle(NULL), IMAGE_OPERATION[i], IMAGE_BITMAP, g_i_BUTTON_SIZE, g_i_BUTTON_SIZE, LR_LOADFROMFILE);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_PLUS + i), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hButton_operation[i]);
+		}
 		CreateWindowEx
 		(
 			NULL, "Button", "<-",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 			BUTTON_SHIFT_X(4), BUTTON_SHIFT_Y(0),
 			g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
 			hwnd,
@@ -184,11 +221,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
-
+		HBITMAP hButton_BSP = (HBITMAP)LoadImage(GetModuleHandle(NULL), "Button_BSP.bmp", IMAGE_BITMAP, g_i_BUTTON_SIZE, g_i_BUTTON_SIZE, LR_LOADFROMFILE);
+		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_BSP), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hButton_BSP);
 		CreateWindowEx
 		(
 			NULL, "Button", "C",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 			BUTTON_SHIFT_X(4), BUTTON_SHIFT_Y(1),
 			g_i_BUTTON_SIZE, g_i_BUTTON_SIZE,
 			hwnd,
@@ -196,10 +234,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
+		HBITMAP hButton_CLR = (HBITMAP)LoadImage(GetModuleHandle(NULL), "Button_CLR.bmp", IMAGE_BITMAP, g_i_BUTTON_SIZE, g_i_BUTTON_SIZE, LR_LOADFROMFILE);
+		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_CLR), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hButton_CLR);
 		CreateWindowEx
 		(
 			NULL, "Button", "=",
-			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON | BS_BITMAP,
 			BUTTON_SHIFT_X(4), BUTTON_SHIFT_Y(2),
 			g_i_BUTTON_SIZE, g_i_BUTTON_DOUBLE_SIZE,
 			hwnd,
@@ -207,6 +247,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
+		HBITMAP hButton_Equal = (HBITMAP)LoadImage(GetModuleHandle(NULL), "Button_Equal.bmp", IMAGE_BITMAP, g_i_BUTTON_SIZE, g_i_BUTTON_DOUBLE_SIZE, LR_LOADFROMFILE);
+		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EQUAL), BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hButton_Equal);
 	}
 	break;
 	case WM_COMMAND:
@@ -250,6 +292,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
 		{
+			if (a == DBL_MIN) break;
 			if (input) b = atof(sz_display);
 			switch (operation)
 			{
@@ -275,6 +318,102 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			operation = 0;
 			input = input_operation = FALSE;
 			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)"0");
+		}
+	}
+	break;
+	case WM_KEYDOWN:
+	{
+		//HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
+		if (wParam >= 0x60 && wParam <= 0x69)
+			SendMessage(GetDlgItem(hwnd, wParam - 0x60 + IDC_BUTTON_0), BM_SETSTATE, TRUE, 0);
+		if (wParam >= 0x30 && wParam <= 0x39)
+			SendMessage(GetDlgItem(hwnd, wParam - 0x30 + IDC_BUTTON_0), BM_SETSTATE, TRUE, 0);
+		switch (wParam)
+		{
+		case VK_DECIMAL:
+		case VK_OEM_PERIOD:
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_POINT), BM_SETSTATE, TRUE, 0);
+			break;
+		case VK_ADD:
+		case VK_OEM_PLUS:
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_PLUS), BM_SETSTATE, TRUE, 0);
+			break;
+		case VK_SUBTRACT:
+		case VK_OEM_MINUS:
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_MINUS), BM_SETSTATE, TRUE, 0);
+			break;
+		case VK_MULTIPLY:
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_ASTER), BM_SETSTATE, TRUE, 0);
+			break;
+		case VK_DIVIDE:
+		case VK_OEM_2:
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_SLASH), BM_SETSTATE, TRUE, 0);
+			break;
+		case VK_RETURN:
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EQUAL), BM_SETSTATE, TRUE, 0);
+			break;
+		case VK_DELETE:
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_CLR), BM_SETSTATE, TRUE, 0);
+			break;
+		case VK_BACK:
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_BSP), BM_SETSTATE, TRUE, 0);
+			break;
+		case VK_ESCAPE:
+			SendMessage(hwnd, WM_CLOSE, 0, 0);
+			break;
+		}
+	}
+	break;
+	case WM_KEYUP:
+	{
+		if (wParam >= 0x60 && wParam <= 0x69)
+		{
+			SendMessage(hwnd, WM_COMMAND, LOWORD(wParam - 0x60 + IDC_BUTTON_0), 0);
+			SendMessage(GetDlgItem(hwnd, wParam - 0x60 + IDC_BUTTON_0), BM_SETSTATE, FALSE, 0);
+		}
+		if (wParam >= 0x30 && wParam <= 0x39)
+		{
+			SendMessage(hwnd, WM_COMMAND, LOWORD(wParam - 0x30 + IDC_BUTTON_0), 0);
+			SendMessage(GetDlgItem(hwnd, wParam - 0x30 + IDC_BUTTON_0), BM_SETSTATE, FALSE, 0);
+		}
+		switch (wParam)
+		{
+		case VK_DECIMAL:
+		case VK_OEM_PERIOD:
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_POINT), 0);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_POINT), BM_SETSTATE, FALSE, 0);
+			break;
+		case VK_ADD:
+		case VK_OEM_PLUS:
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_PLUS), 0);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_PLUS), BM_SETSTATE, FALSE, 0);
+			break;
+		case VK_SUBTRACT:
+		case VK_OEM_MINUS:
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_MINUS), 0);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_MINUS), BM_SETSTATE, FALSE, 0);
+			break;
+		case VK_MULTIPLY:
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_ASTER), 0);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_ASTER), BM_SETSTATE, FALSE, 0);
+			break;
+		case VK_DIVIDE:
+		case VK_OEM_2:
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_SLASH), 0);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_SLASH), BM_SETSTATE, FALSE, 0);
+			break;
+		case VK_RETURN:
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_EQUAL), 0);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_EQUAL), BM_SETSTATE, FALSE, 0);
+			break;
+		case VK_DELETE:
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_CLR), 0);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_CLR), BM_SETSTATE, FALSE, 0);
+			break;
+		case VK_BACK:
+			SendMessage(hwnd, WM_COMMAND, LOWORD(IDC_BUTTON_BSP), 0);
+			SendMessage(GetDlgItem(hwnd, IDC_BUTTON_BSP), BM_SETSTATE, FALSE, 0);
+			break;
 		}
 	}
 	break;
