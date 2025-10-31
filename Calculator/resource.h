@@ -25,6 +25,12 @@
 #define IDC_BUTTON_CLR					1016
 #define IDC_BUTTON_EQUAL				1017
 
+#define THEME_0							1100	//Выберите тему:
+#define THEME_1							1101	//metal_mistral
+#define THEME_2							1102	//square_blue
+#define THEME_3							1103	//my_buttons
+
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

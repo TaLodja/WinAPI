@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include "resource.h"
 
+CONST CHAR* theme[] = { "Выберите тему:", "metal_mistral", "square_blue", "my_buttons" };
+
 CONST CHAR g_sz_CLASS_NAME[] = "Calc_SPU_411";
 
 CONST INT g_i_BUTTON_SIZE = 80;		//Размер кнопки
@@ -218,7 +220,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
-		SetSkin(hwnd, "metal_mistral");
+		CHAR sz_skin[FILENAME_MAX] = "metal_mistral";
+		SetSkin(hwnd, sz_skin);
+
 	}
 	break;
 	case WM_COMMAND:
@@ -397,6 +401,31 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		break;
+	case WM_CONTEXTMENU:
+	{
+		POINT pt;
+		GetCursorPos(&pt);
+		HMENU hMenu = CreatePopupMenu();
+		for (int i = 0; i < 4; i++)
+		{
+			AppendMenu(hMenu, MF_STRING, 1100 + i, theme[i]);
+		}
+		EnableMenuItem(hMenu, 1100, MF_GRAYED);
+		INT hTheme = TrackPopupMenuEx
+		(
+			hMenu,
+			TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD | TPM_LEFTBUTTON,
+			pt.x, pt.y,
+			hwnd,
+			NULL
+		);
+		CHAR sz_skin[FILENAME_MAX];
+		GetMenuString(hMenu, hTheme, sz_skin, FILENAME_MAX, MF_BYCOMMAND);
+		SetSkin(hwnd, sz_skin);
+		//SendMessage(hwnd, WM_CREAT, 0, 0);
+		DestroyMenu(hMenu);
+	}
+	break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
@@ -419,10 +448,10 @@ VOID SetSkin(HWND hwnd, CONST CHAR SZ_SKIN[])
 			GetModuleHandle(NULL),
 			sz_filename,
 			IMAGE_BITMAP,
-			i >0 ? g_i_BUTTON_SIZE : g_i_BUTTON_DOUBLE_SIZE,
+			i > 0 ? g_i_BUTTON_SIZE : g_i_BUTTON_DOUBLE_SIZE,
 			g_i_BUTTON_SIZE,
 			LR_LOADFROMFILE
 		);
-		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0+i), BM_SETIMAGE, 0, (LPARAM)hBitmap);
+		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0 + i), BM_SETIMAGE, 0, (LPARAM)hBitmap);
 	}
 }
