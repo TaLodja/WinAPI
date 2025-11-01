@@ -5,6 +5,7 @@
 #include "resource.h"
 
 CONST CHAR* theme[] = { "Выберите тему:", "metal_mistral", "square_blue", "my_buttons" };
+CONST CHAR* font[] = { "Выберите шрифт:", "Metalsmith", "BarqueRegular", "Blazeberg" };
 
 CONST CHAR g_sz_CLASS_NAME[] = "Calc_SPU_411";
 
@@ -29,6 +30,7 @@ CONST INT g_i_OPERATIONS_START_X = g_i_BUTTON_START_X + (g_i_BUTTON_SIZE + g_i_I
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 VOID SetSkin(HWND hwnd, CONST CHAR SZ_SKIN[]);
+VOID SetFont(HWND hwnd, HFONT hFontResource, CONST CHAR SZ_FONT[]);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -98,6 +100,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static INT operation = 0;				//нажата ли кнопка операции
 	static BOOL input = FALSE;				//флаг, который устанавливается при нажатии на цифру
 	static BOOL input_operation = FALSE;	//флаг, который устанавливается при нажатии на кнопку операции
+	static HFONT hFontResource = NULL;
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -220,8 +223,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
-		CHAR sz_skin[FILENAME_MAX] = "metal_mistral";
-		SetSkin(hwnd, sz_skin);
+		SetSkin(hwnd, theme[2]);
+		SetFont(hwnd, hFontResource, font[2]);
 	}
 	break;
 	case WM_COMMAND:
@@ -408,6 +411,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		for (int i = 0; i < 4; i++)
 			AppendMenu(hMenu, MF_STRING, 1100 + i, theme[i]);
 		EnableMenuItem(hMenu, 1100, MF_GRAYED);
+		for (int i = 0; i < 4; i++)
+			AppendMenu(hMenu, MF_STRING, 1200 + i, font[i]);
+		EnableMenuItem(hMenu, 1200, MF_GRAYED);
 		INT hTheme = TrackPopupMenuEx
 		(
 			hMenu,
@@ -418,12 +424,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 		CHAR sz_skin[FILENAME_MAX];
 		GetMenuString(hMenu, hTheme, sz_skin, FILENAME_MAX, MF_BYCOMMAND);
-		SetSkin(hwnd, sz_skin);
+		if (hTheme>=1100 && hTheme<=1103) SetSkin(hwnd, sz_skin);
+		if (hFontResource) DeleteObject(hFontResource);
+		if (hTheme>=1200 && hTheme<=1203) SetFont(hwnd, hFontResource, sz_skin);
 		DestroyMenu(hMenu);
 	}
 	break;
 	case WM_DESTROY:
+	{
+		if (hFontResource) DeleteObject(hFontResource);
 		PostQuitMessage(0);
+	}
 		break;
 	case WM_CLOSE:
 		SendMessage(hwnd, WM_DESTROY, 0, 0);
@@ -468,4 +479,18 @@ VOID SetSkin(HWND hwnd, CONST CHAR SZ_SKIN[])
 		);
 		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0 + i), BM_SETIMAGE, 0, (LPARAM)hBitmap);
 	}*/
+}
+VOID SetFont(HWND hwnd, HFONT hFontResource, CONST CHAR SZ_FONT[])
+{
+	CHAR sz_filename[FILENAME_MAX] = {};
+	sprintf(sz_filename, "Fonts\\%s.otf", SZ_FONT);
+	AddFontResourceEx(sz_filename, FR_PRIVATE, 0);
+	hFontResource = CreateFont
+	(
+		72, 0, 0, 0, FW_NORMAL,
+		FALSE, FALSE, FALSE,
+		ANSI_CHARSET, OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS,
+		DEFAULT_QUALITY, DEFAULT_PITCH, (LPCSTR)SZ_FONT
+	);
+	SendMessage(GetDlgItem(hwnd, IDC_EDIT), WM_SETFONT, (WPARAM)hFontResource, MAKELPARAM(TRUE, 0));
 }

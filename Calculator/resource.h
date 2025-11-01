@@ -30,6 +30,10 @@
 #define THEME_2							1102	//square_blue
 #define THEME_3							1103	//my_buttons
 
+#define FONT_0							1200	//ֲûבונטעו רנטפע:
+#define FONT_1							1201	//Metalsmith
+#define FONT_2							1202	//BarqueRegular
+#define FONT_3							1203	//Blazeberg
 
 // Next default values for new objects
 // 
