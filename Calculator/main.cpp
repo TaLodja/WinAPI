@@ -222,7 +222,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 		CHAR sz_skin[FILENAME_MAX] = "metal_mistral";
 		SetSkin(hwnd, sz_skin);
-
 	}
 	break;
 	case WM_COMMAND:
@@ -407,9 +406,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		GetCursorPos(&pt);
 		HMENU hMenu = CreatePopupMenu();
 		for (int i = 0; i < 4; i++)
-		{
 			AppendMenu(hMenu, MF_STRING, 1100 + i, theme[i]);
-		}
 		EnableMenuItem(hMenu, 1100, MF_GRAYED);
 		INT hTheme = TrackPopupMenuEx
 		(
@@ -422,7 +419,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CHAR sz_skin[FILENAME_MAX];
 		GetMenuString(hMenu, hTheme, sz_skin, FILENAME_MAX, MF_BYCOMMAND);
 		SetSkin(hwnd, sz_skin);
-		//SendMessage(hwnd, WM_CREAT, 0, 0);
 		DestroyMenu(hMenu);
 	}
 	break;
@@ -439,19 +435,37 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 VOID SetSkin(HWND hwnd, CONST CHAR SZ_SKIN[])
 {
-	for (int i = 0; i < 10; i++)
+	CHAR sz_filename[FILENAME_MAX] = {};
+	sprintf(sz_filename, "%s.dll", SZ_SKIN);
+	HMODULE hLibrary = LoadLibraryEx(sz_filename, NULL, LOAD_LIBRARY_AS_DATAFILE);
+	for (int i = 0; i < 18; i++)
+	{
+		HBITMAP hBitmap = (HBITMAP)LoadImage
+		(
+			hLibrary,
+			(LPCSTR)(101+i),
+			IMAGE_BITMAP,
+			i > 0 ? g_i_BUTTON_SIZE : g_i_BUTTON_DOUBLE_SIZE,
+			i < 17 ? g_i_BUTTON_SIZE : g_i_BUTTON_DOUBLE_SIZE,
+			LR_DEFAULTCOLOR
+		);
+		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0 + i), BM_SETIMAGE, 0, (LPARAM)hBitmap);
+	}
+	FreeLibrary(hLibrary);
+	/*CONST CHAR* button_name[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "point", "plus", "minus", "aster", "slash", "bsp", "clr", "equal"};
+	for (int i = 0; i < 18; i++)
 	{
 		CHAR sz_filename[FILENAME_MAX] = {};
-		sprintf(sz_filename, "ButtonsBMP\\%s\\button_%i.bmp", SZ_SKIN, i);
+		sprintf(sz_filename, "ButtonsBMP\\%s\\button_%s.bmp", SZ_SKIN, button_name[i]);
 		HBITMAP hBitmap = (HBITMAP)LoadImage
 		(
 			GetModuleHandle(NULL),
 			sz_filename,
 			IMAGE_BITMAP,
 			i > 0 ? g_i_BUTTON_SIZE : g_i_BUTTON_DOUBLE_SIZE,
-			g_i_BUTTON_SIZE,
+			i<17?g_i_BUTTON_SIZE:g_i_BUTTON_DOUBLE_SIZE,
 			LR_LOADFROMFILE
 		);
 		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0 + i), BM_SETIMAGE, 0, (LPARAM)hBitmap);
-	}
+	}*/
 }
