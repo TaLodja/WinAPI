@@ -5,7 +5,7 @@
 #include "resource.h"
 
 CONST CHAR* theme[] = { "Выберите тему:", "metal_mistral", "square_blue", "my_buttons" };
-CONST CHAR* font[] = { "Выберите шрифт:", "Metalsmith", "BarqueRegular", "Blazeberg" };
+CONST CHAR* font[] = { "Выберите шрифт:", "Metalsmith", "BarqueRegular", "Blazeberg", "Digital-7 Mono" };
 
 CONST CHAR g_sz_CLASS_NAME[] = "Calc_SPU_411";
 
@@ -411,7 +411,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		for (int i = 0; i < 4; i++)
 			AppendMenu(hMenu, MF_STRING, 1100 + i, theme[i]);
 		EnableMenuItem(hMenu, 1100, MF_GRAYED);
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 5; i++)
 			AppendMenu(hMenu, MF_STRING, 1200 + i, font[i]);
 		EnableMenuItem(hMenu, 1200, MF_GRAYED);
 		INT hTheme = TrackPopupMenuEx
@@ -424,9 +424,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 		CHAR sz_skin[FILENAME_MAX];
 		GetMenuString(hMenu, hTheme, sz_skin, FILENAME_MAX, MF_BYCOMMAND);
-		if (hTheme>=1100 && hTheme<=1103) SetSkin(hwnd, sz_skin);
+		if (hTheme >= 1100 && hTheme <= 1103) SetSkin(hwnd, sz_skin);
 		if (hFontResource) DeleteObject(hFontResource);
-		if (hTheme>=1200 && hTheme<=1203) SetFont(hwnd, hFontResource, sz_skin);
+		if (hTheme >= 1200 && hTheme <= 1204) SetFont(hwnd, hFontResource, sz_skin);
 		DestroyMenu(hMenu);
 	}
 	break;
@@ -435,7 +435,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (hFontResource) DeleteObject(hFontResource);
 		PostQuitMessage(0);
 	}
-		break;
+	break;
 	case WM_CLOSE:
 		SendMessage(hwnd, WM_DESTROY, 0, 0);
 		break;
@@ -446,15 +446,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 VOID SetSkin(HWND hwnd, CONST CHAR SZ_SKIN[])
 {
-	CHAR sz_filename[FILENAME_MAX] = {};
-	sprintf(sz_filename, "%s.dll", SZ_SKIN);
-	HMODULE hLibrary = LoadLibraryEx(sz_filename, NULL, LOAD_LIBRARY_AS_DATAFILE);
+	HMODULE hLibrary = LoadLibraryEx(SZ_SKIN, NULL, LOAD_LIBRARY_AS_DATAFILE);
 	for (int i = 0; i < 18; i++)
 	{
 		HBITMAP hBitmap = (HBITMAP)LoadImage
 		(
 			hLibrary,
-			(LPCSTR)(101+i),
+			(LPCSTR)(101 + i),
 			IMAGE_BITMAP,
 			i > 0 ? g_i_BUTTON_SIZE : g_i_BUTTON_DOUBLE_SIZE,
 			i < 17 ? g_i_BUTTON_SIZE : g_i_BUTTON_DOUBLE_SIZE,
@@ -463,34 +461,21 @@ VOID SetSkin(HWND hwnd, CONST CHAR SZ_SKIN[])
 		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0 + i), BM_SETIMAGE, 0, (LPARAM)hBitmap);
 	}
 	FreeLibrary(hLibrary);
-	/*CONST CHAR* button_name[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "point", "plus", "minus", "aster", "slash", "bsp", "clr", "equal"};
-	for (int i = 0; i < 18; i++)
-	{
-		CHAR sz_filename[FILENAME_MAX] = {};
-		sprintf(sz_filename, "ButtonsBMP\\%s\\button_%s.bmp", SZ_SKIN, button_name[i]);
-		HBITMAP hBitmap = (HBITMAP)LoadImage
-		(
-			GetModuleHandle(NULL),
-			sz_filename,
-			IMAGE_BITMAP,
-			i > 0 ? g_i_BUTTON_SIZE : g_i_BUTTON_DOUBLE_SIZE,
-			i<17?g_i_BUTTON_SIZE:g_i_BUTTON_DOUBLE_SIZE,
-			LR_LOADFROMFILE
-		);
-		SendMessage(GetDlgItem(hwnd, IDC_BUTTON_0 + i), BM_SETIMAGE, 0, (LPARAM)hBitmap);
-	}*/
 }
 VOID SetFont(HWND hwnd, HFONT hFontResource, CONST CHAR SZ_FONT[])
 {
 	CHAR sz_filename[FILENAME_MAX] = {};
-	sprintf(sz_filename, "Fonts\\%s.otf", SZ_FONT);
+	!strcmp(SZ_FONT, "Digital-7 Mono") ? sprintf(sz_filename, "Fonts\\%s.ttf", SZ_FONT) :
+		sprintf(sz_filename, "Fonts\\%s.otf", SZ_FONT);
 	AddFontResourceEx(sz_filename, FR_PRIVATE, 0);
 	hFontResource = CreateFont
 	(
-		72, 0, 0, 0, FW_NORMAL,
+		g_i_SCREEN_HEIGHT - 2,
+		g_i_SCREEN_HEIGHT / 2,
+		0, 0, 500,
 		FALSE, FALSE, FALSE,
-		ANSI_CHARSET, OUT_CHARACTER_PRECIS, CLIP_CHARACTER_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH, (LPCSTR)SZ_FONT
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_CHARACTER_PRECIS,
+		ANTIALIASED_QUALITY, DEFAULT_PITCH, (LPCSTR)SZ_FONT
 	);
 	SendMessage(GetDlgItem(hwnd, IDC_EDIT), WM_SETFONT, (WPARAM)hFontResource, MAKELPARAM(TRUE, 0));
 }

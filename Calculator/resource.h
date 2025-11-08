@@ -34,6 +34,7 @@
 #define FONT_1							1201	//Metalsmith
 #define FONT_2							1202	//BarqueRegular
 #define FONT_3							1203	//Blazeberg
+#define FONT_4							1204	//digital-7 (mono)
 
 // Next default values for new objects
 // 
