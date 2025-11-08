@@ -102,7 +102,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 	{
-		//Aloc();
+		//AllocConsole();			//Открывает/Слздает консоль
 		//freopen("CONOUT", "w", stdout);
 		HWND hEdit = CreateWindowEx
 		(
@@ -117,6 +117,25 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
+
+		AddFontResourceEx("Fonts_class\\digital-7 (mono).ttf", FR_PRIVATE, 0);
+		HFONT hFont = CreateFont
+		(
+			g_i_SCREEN_HEIGHT-2,
+			g_i_SCREEN_HEIGHT/2,
+			0, 0,
+			500, 0, 0, 0,
+			DEFAULT_CHARSET, 
+			OUT_DEFAULT_PRECIS, 
+			CLIP_CHARACTER_PRECIS,
+			ANTIALIASED_QUALITY,
+			DEFAULT_PITCH,
+			"Digital-7 Mono"
+		);
+		SendMessage(hEdit, WM_SETFONT, (WPARAM)hFont, TRUE);
+
+		/////////////////////////////////////////////////////////////////////////////////////
+
 		INT digit = 1;
 		CHAR sz_digit[2] = "";
 		for (int i = 6; i >= 0; i -= 3)
