@@ -224,7 +224,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			NULL
 		);
 		SetSkin(hwnd, theme[2]);
-		SetFont(hwnd, hFontResource, font[2]);
+		SetFont(hwnd, hFontResource, font[4]);
 	}
 	break;
 	case WM_COMMAND:
