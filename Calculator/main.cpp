@@ -5,7 +5,7 @@
 #include "resource.h"
 
 CONST CHAR* theme[] = { "Выберите тему:", "metal_mistral", "square_blue", "my_buttons" };
-CONST CHAR* font[] = { "Выберите шрифт:", "Metalsmith", "BarqueRegular", "Blazeberg", "Digital-7 Mono" };
+CONST CHAR* font[] = { "Выберите шрифт:", "KTF-Roadbrush", "MTF Becki", "BM EULJIRO TTF", "Digital-7 Mono" };
 
 CONST CHAR g_sz_CLASS_NAME[] = "Calc_SPU_411";
 
@@ -425,7 +425,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CHAR sz_skin[FILENAME_MAX];
 		GetMenuString(hMenu, hTheme, sz_skin, FILENAME_MAX, MF_BYCOMMAND);
 		if (hTheme >= 1100 && hTheme <= 1103) SetSkin(hwnd, sz_skin);
-		if (hFontResource) DeleteObject(hFontResource);
 		if (hTheme >= 1200 && hTheme <= 1204) SetFont(hwnd, hFontResource, sz_skin);
 		DestroyMenu(hMenu);
 	}
@@ -464,7 +463,27 @@ VOID SetSkin(HWND hwnd, CONST CHAR SZ_SKIN[])
 }
 VOID SetFont(HWND hwnd, HFONT hFontResource, CONST CHAR SZ_FONT[])
 {
-	CHAR sz_filename[FILENAME_MAX] = {};
+	if (hFontResource) DeleteObject(hFontResource);
+	HMODULE hLibFont = LoadLibrary("DLL_Fonts.dll");
+	for (int i = 0; i < 4; i++)
+	{
+		HRSRC hFontRes = FindResource(hLibFont, (LPCSTR)(101+i), "BINARY");
+		HGLOBAL hFontMem = LoadResource(hLibFont, hFontRes);
+		DWORD nFonts = 0, len = SizeofResource(hLibFont, hFontRes);
+		AddFontMemResourceEx(LockResource(hFontMem), len, nullptr, &nFonts);
+	}
+	hFontResource = CreateFont
+	(
+		g_i_SCREEN_HEIGHT - 2,
+		g_i_SCREEN_HEIGHT / 2,
+		0, 0, 500,
+		FALSE, FALSE, FALSE,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_CHARACTER_PRECIS,
+		ANTIALIASED_QUALITY, DEFAULT_PITCH, (LPCSTR)SZ_FONT
+	);
+	SendMessage(GetDlgItem(hwnd, IDC_EDIT), WM_SETFONT, (WPARAM)hFontResource, TRUE);
+	FreeLibrary(hLibFont);
+	/*CHAR sz_filename[FILENAME_MAX] = {};
 	!strcmp(SZ_FONT, "Digital-7 Mono") ? sprintf(sz_filename, "Fonts\\%s.ttf", SZ_FONT) :
 		sprintf(sz_filename, "Fonts\\%s.otf", SZ_FONT);
 	AddFontResourceEx(sz_filename, FR_PRIVATE, 0);
@@ -477,5 +496,5 @@ VOID SetFont(HWND hwnd, HFONT hFontResource, CONST CHAR SZ_FONT[])
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_CHARACTER_PRECIS,
 		ANTIALIASED_QUALITY, DEFAULT_PITCH, (LPCSTR)SZ_FONT
 	);
-	SendMessage(GetDlgItem(hwnd, IDC_EDIT), WM_SETFONT, (WPARAM)hFontResource, MAKELPARAM(TRUE, 0));
+	SendMessage(GetDlgItem(hwnd, IDC_EDIT), WM_SETFONT, (WPARAM)hFontResource, MAKELPARAM(TRUE, 0));*/
 }
